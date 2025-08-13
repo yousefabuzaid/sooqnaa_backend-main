@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Swagger URL</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .test { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Test Swagger Documentation URL</h1>
+    
+    <div class="test">
+        <h3>Test 1: Direct JSON File</h3>
+        <button onclick="testDirectJson()">Test Direct JSON</button>
+        <div id="directResult"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 2: Swagger Docs Route</h3>
+        <button onclick="testDocsRoute()">Test Docs Route</button>
+        <div id="docsResult"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 3: Swagger UI with Manual URL</h3>
+        <button onclick="testManualUI()">Test Manual UI</button>
+        <div id="manualResult"></div>
+    </div>
+
+    <script>
+        async function testDirectJson() {
+            const result = document.getElementById('directResult');
+            try {
+                const response = await fetch('/Sooqnaa_backend_new/storage/api-docs/api-docs.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    result.innerHTML = `<span class="success">✅ Direct JSON accessible!</span><br><pre>${JSON.stringify(data, null, 2).substring(0, 500)}...</pre>`;
+                } else {
+                    result.innerHTML = `<span class="error">❌ Direct JSON failed: ${response.status}</span>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function testDocsRoute() {
+            const result = document.getElementById('docsResult');
+            try {
+                const response = await fetch('/Sooqnaa_backend_new/public/docs');
+                if (response.ok) {
+                    const data = await response.json();
+                    result.innerHTML = `<span class="success">✅ Docs route accessible!</span><br><pre>${JSON.stringify(data, null, 2).substring(0, 500)}...</pre>`;
+                } else {
+                    result.innerHTML = `<span class="error">❌ Docs route failed: ${response.status}</span>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function testManualUI() {
+            const result = document.getElementById('manualResult');
+            try {
+                // Create a simple Swagger UI manually
+                const swaggerUI = `
+                    <div id="swagger-ui"></div>
+                    <script src="https://unpkg.com/swagger-ui-dist@5.27.1/swagger-ui-bundle.js"></script>
+                    <script src="https://unpkg.com/swagger-ui-dist@5.27.1/swagger-ui-standalone-preset.js"></script>
+                    <script>
+                        window.onload = function() {
+                            const ui = SwaggerUIBundle({
+                                dom_id: '#swagger-ui',
+                                url: '/Sooqnaa_backend_new/storage/api-docs/api-docs.json',
+                                presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+                                layout: "StandaloneLayout"
+                            });
+                        }
+                    </script>
+                `;
+                result.innerHTML = `<span class="success">✅ Manual UI created!</span><br>${swaggerUI}`;
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

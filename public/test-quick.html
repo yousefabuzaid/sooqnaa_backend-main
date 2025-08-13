@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick API Test</title>
+</head>
+<body>
+    <h1>Quick API Test</h1>
+    <button onclick="testRegister()">Test Register</button>
+    <button onclick="testHealth()">Test Health</button>
+    <div id="result"></div>
+
+    <script>
+        const API_BASE = `${window.location.origin}/Sooqnaa_backend_new/public/api`;
+        
+        async function testRegister() {
+            const data = {
+                first_name: 'Test',
+                last_name: 'User',
+                email: 'test' + Date.now() + '@example.com',
+                phone: '+1234567890',
+                password: 'password123',
+                password_confirmation: 'password123',
+                role: 'customer'
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                document.getElementById('result').innerHTML = 
+                    `<h3>Register Result (${response.status}):</h3><pre>${JSON.stringify(result, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    `<h3>Error:</h3><pre>${error.message}</pre>`;
+            }
+        }
+        
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const result = await response.json();
+                document.getElementById('result').innerHTML = 
+                    `<h3>Health Result (${response.status}):</h3><pre>${JSON.stringify(result, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    `<h3>Error:</h3><pre>${error.message}</pre>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sooqnaa API Test Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+        }
+
+        .section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #495057);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+
+        .response-area {
+            grid-column: 1 / -1;
+            margin-top: 30px;
+        }
+
+        .response {
+            background: #212529;
+            color: #28a745;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            border: 1px solid #495057;
+        }
+
+        .status-bar {
+            background: #343a40;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: monospace;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-connected {
+            background: #28a745;
+        }
+
+        .status-disconnected {
+            background: #dc3545;
+        }
+
+        .token-display {
+            font-size: 12px;
+            opacity: 0.8;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .clear-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #495057;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .response-container {
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: " Loading...";
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Sooqnaa API Tester</h1>
+            <p>Test all authentication endpoints with a beautiful interface</p>
+        </div>
+
+        <div class="status-bar">
+            <div>
+                <span class="status-indicator" id="statusIndicator"></span>
+                <span id="statusText">Ready</span>
+            </div>
+            <div class="token-display" id="tokenDisplay">No token</div>
+        </div>
+
+        <div class="content">
+            <!-- Registration Section -->
+            <div class="section">
+                <h2>🔐 User Registration</h2>
+                <div class="form-group">
+                    <label for="regFirstName">First Name</label>
+                    <input type="text" id="regFirstName" value="John" placeholder="Enter first name">
+                </div>
+                <div class="form-group">
+                    <label for="regLastName">Last Name</label>
+                    <input type="text" id="regLastName" value="Doe" placeholder="Enter last name">
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" value="john.doe@example.com" placeholder="Enter email">
+                </div>
+                <div class="form-group">
+                    <label for="regPhone">Phone (optional)</label>
+                    <input type="tel" id="regPhone" value="+1234567890" placeholder="Enter phone number">
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input type="password" id="regPassword" value="password123" placeholder="Enter password">
+                </div>
+                <div class="form-group">
+                    <label for="regPasswordConfirm">Confirm Password</label>
+                    <input type="password" id="regPasswordConfirm" value="password123" placeholder="Confirm password">
+                </div>
+                <div class="form-group">
+                    <label for="regRole">Role</label>
+                    <select id="regRole">
+                        <option value="customer">Customer</option>
+                        <option value="merchant">Merchant</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="register()">Register User</button>
+            </div>
+
+            <!-- Login Section -->
+            <div class="section">
+                <h2>🔑 User Login</h2>
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" value="admin@sooqnaa.com" placeholder="Enter email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" value="password123" placeholder="Enter password">
+                </div>
+                <button class="btn" onclick="login()">Login</button>
+                <button class="btn btn-secondary" onclick="getMe()">Get Current User</button>
+                <button class="btn btn-danger" onclick="logout()">Logout</button>
+            </div>
+
+            <!-- Password Reset Section -->
+            <div class="section">
+                <h2>🔄 Password Reset</h2>
+                <div class="form-group">
+                    <label for="forgotEmail">Email for Reset</label>
+                    <input type="email" id="forgotEmail" value="admin@sooqnaa.com" placeholder="Enter email">
+                </div>
+                <button class="btn" onclick="forgotPassword()">Request Reset</button>
+                
+                <div style="margin-top: 20px;">
+                    <div class="form-group">
+                        <label for="resetToken">Reset Token</label>
+                        <input type="text" id="resetToken" placeholder="Enter reset token">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" value="newpassword123" placeholder="Enter new password">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPasswordConfirm">Confirm New Password</label>
+                        <input type="password" id="newPasswordConfirm" value="newpassword123" placeholder="Confirm new password">
+                    </div>
+                    <button class="btn" onclick="resetPassword()">Reset Password</button>
+                </div>
+            </div>
+
+            <!-- Profile Management -->
+            <div class="section">
+                <h2>👤 Profile Management</h2>
+                <button class="btn" onclick="getProfile()">Get Profile</button>
+                
+                <div style="margin-top: 15px;">
+                    <div class="form-group">
+                        <label for="updateFirstName">First Name</label>
+                        <input type="text" id="updateFirstName" value="John" placeholder="First name">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateLastName">Last Name</label>
+                        <input type="text" id="updateLastName" value="Smith" placeholder="Last name">
+                    </div>
+                    <div class="form-group">
+                        <label for="updatePhone">Phone</label>
+                        <input type="tel" id="updatePhone" value="+1234567891" placeholder="Phone number">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateAvatar">Avatar URL</label>
+                        <input type="url" id="updateAvatar" value="https://example.com/avatar.jpg" placeholder="Avatar URL">
+                    </div>
+                    <button class="btn" onclick="updateProfile()">Update Profile</button>
+                </div>
+            </div>
+
+            <!-- Token & Verification -->
+            <div class="section">
+                <h2>🔗 Token & Verification</h2>
+                <button class="btn" onclick="refreshToken()">Refresh Token</button>
+                
+                <div style="margin-top: 15px;">
+                    <div class="form-group">
+                        <label for="verifyEmailToken">Email Verification Token</label>
+                        <input type="text" id="verifyEmailToken" placeholder="Enter email verification token">
+                    </div>
+                    <button class="btn" onclick="verifyEmail()">Verify Email</button>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <div class="form-group">
+                        <label for="verifyPhoneToken">Phone Verification Token</label>
+                        <input type="text" id="verifyPhoneToken" placeholder="Enter phone verification token">
+                    </div>
+                    <button class="btn" onclick="verifyPhone()">Verify Phone</button>
+                </div>
+            </div>
+
+            <!-- System Functions -->
+            <div class="section">
+                <h2>🏥 System Functions</h2>
+                <button class="btn btn-success" onclick="healthCheck()">Health Check</button>
+                <button class="btn btn-secondary" onclick="clearResponse()">Clear Console</button>
+                
+                <div style="margin-top: 15px;">
+                    <strong>Quick Test Users:</strong><br>
+                    <small style="color: #6c757d;">
+                        Admin: admin@sooqnaa.com / password123<br>
+                        Merchant: merchant@sooqnaa.com / password123<br>
+                        Customer: customer@sooqnaa.com / password123
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="response-area">
+            <div class="section">
+                <h2>📋 API Response Console</h2>
+                <div class="response-container">
+                    <button class="clear-btn" onclick="clearResponse()">Clear</button>
+                    <div class="response" id="responseArea">
+Welcome to Sooqnaa API Tester! 🎉
+
+Ready to test your authentication API endpoints.
+Use the forms above to test different functions.
+
+API Base URL: ${window.location.origin}/Sooqnaa_backend_new/public/api
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = `${window.location.origin}/Sooqnaa_backend_new/public/api`;
+        let authToken = localStorage.getItem('authToken') || '';
+        
+        // Update UI on load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatusBar();
+            if (authToken) {
+                getMe();
+            }
+        });
+
+        // Utility functions
+        function updateStatusBar() {
+            const indicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            const tokenDisplay = document.getElementById('tokenDisplay');
+            
+            if (authToken) {
+                indicator.className = 'status-indicator status-connected';
+                statusText.textContent = 'Authenticated';
+                tokenDisplay.textContent = `Token: ${authToken.substring(0, 20)}...`;
+            } else {
+                indicator.className = 'status-indicator status-disconnected';
+                statusText.textContent = 'Not authenticated';
+                tokenDisplay.textContent = 'No token';
+            }
+        }
+
+        function logResponse(endpoint, method, status, data) {
+            const responseArea = document.getElementById('responseArea');
+            const timestamp = new Date().toLocaleTimeString();
+            const statusColor = status >= 200 && status < 300 ? '#28a745' : '#dc3545';
+            
+            const logEntry = `
+[${timestamp}] ${method} ${endpoint}
+Status: ${status}
+Response: ${JSON.stringify(data, null, 2)}
+${'='.repeat(80)}
+
+`;
+            
+            responseArea.innerHTML = logEntry + responseArea.innerHTML;
+        }
+
+        function clearResponse() {
+            document.getElementById('responseArea').innerHTML = 'Console cleared. Ready for new requests...\n';
+        }
+
+        function setLoading(button, loading = true) {
+            if (loading) {
+                button.classList.add('loading');
+                button.disabled = true;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
+
+        // API call wrapper
+        async function apiCall(endpoint, method = 'GET', data = null, requireAuth = false) {
+            const url = `${API_BASE}${endpoint}`;
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            };
+            
+            if (requireAuth && authToken) {
+                headers['Authorization'] = `Bearer ${authToken}`;
+            }
+            
+            const config = {
+                method,
+                headers,
+            };
+            
+            if (data) {
+                config.body = JSON.stringify(data);
+            }
+            
+            try {
+                const response = await fetch(url, config);
+                const responseData = await response.json();
+                
+                logResponse(endpoint, method, response.status, responseData);
+                
+                // Store token if received
+                if (responseData.token) {
+                    authToken = responseData.token;
+                    localStorage.setItem('authToken', authToken);
+                    updateStatusBar();
+                }
+                
+                return { status: response.status, data: responseData };
+            } catch (error) {
+                const errorData = { error: error.message };
+                logResponse(endpoint, method, 'ERROR', errorData);
+                return { status: 0, data: errorData };
+            }
+        }
+
+        // Authentication functions
+        async function register() {
+            const button = event.target;
+            setLoading(button);
+            
+            const data = {
+                first_name: document.getElementById('regFirstName').value,
+                last_name: document.getElementById('regLastName').value,
+                email: document.getElementById('regEmail').value,
+                phone: document.getElementById('regPhone').value,
+                password: document.getElementById('regPassword').value,
+                password_confirmation: document.getElementById('regPasswordConfirm').value,
+                role: document.getElementById('regRole').value,
+            };
+            
+            await apiCall('/auth/register', 'POST', data);
+            setLoading(button, false);
+        }
+
+        async function login() {
+            const button = event.target;
+            setLoading(button);
+            
+            const data = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value,
+            };
+            
+            await apiCall('/auth/login', 'POST', data);
+            setLoading(button, false);
+        }
+
+        async function logout() {
+            const button = event.target;
+            setLoading(button);
+            
+            await apiCall('/auth/logout', 'POST', null, true);
+            
+            authToken = '';
+            localStorage.removeItem('authToken');
+            updateStatusBar();
+            setLoading(button, false);
+        }
+
+        async function getMe() {
+            const button = event?.target;
+            if (button) setLoading(button);
+            
+            await apiCall('/auth/me', 'GET', null, true);
+            
+            if (button) setLoading(button, false);
+        }
+
+        async function refreshToken() {
+            const button = event.target;
+            setLoading(button);
+            
+            await apiCall('/auth/refresh', 'POST', null, true);
+            setLoading(button, false);
+        }
+
+        // Password reset functions
+        async function forgotPassword() {
+            const button = event.target;
+            setLoading(button);
+            
+            const data = {
+                email: document.getElementById('forgotEmail').value,
+            };
+            
+            await apiCall('/auth/forgot-password', 'POST', data);
+            setLoading(button, false);
+        }
+
+        async function resetPassword() {
+            const button = event.target;
+            setLoading(button);
+            
+            const data = {
+                token: document.getElementById('resetToken').value,
+                password: document.getElementById('newPassword').value,
+                password_confirmation: document.getElementById('newPasswordConfirm').value,
+            };
+            
+            await apiCall('/auth/reset-password', 'POST', data);
+            setLoading(button, false);
+        }
+
+        // Verification functions
+        async function verifyEmail() {
+            const button = event.target;
+            setLoading(button);
+            
+            const token = document.getElementById('verifyEmailToken').value;
+            await apiCall(`/auth/verify-email/${token}`, 'GET');
+            setLoading(button, false);
+        }
+
+        async function verifyPhone() {
+            const button = event.target;
+            setLoading(button);
+            
+            const token = document.getElementById('verifyPhoneToken').value;
+            await apiCall(`/auth/verify-phone/${token}`, 'GET');
+            setLoading(button, false);
+        }
+
+        // Profile functions
+        async function getProfile() {
+            const button = event.target;
+            setLoading(button);
+            
+            await apiCall('/profile', 'GET', null, true);
+            setLoading(button, false);
+        }
+
+        async function updateProfile() {
+            const button = event.target;
+            setLoading(button);
+            
+            const data = {
+                first_name: document.getElementById('updateFirstName').value,
+                last_name: document.getElementById('updateLastName').value,
+                phone: document.getElementById('updatePhone').value,
+                avatar_url: document.getElementById('updateAvatar').value,
+            };
+            
+            await apiCall('/profile', 'PUT', data, true);
+            setLoading(button, false);
+        }
+
+        // System functions
+        async function healthCheck() {
+            const button = event.target;
+            setLoading(button);
+            
+            await apiCall('/health', 'GET');
+            setLoading(button, false);
+        }
+
+        // Auto-fill login with test users
+        function fillTestUser(type) {
+            const emails = {
+                admin: 'admin@sooqnaa.com',
+                merchant: 'merchant@sooqnaa.com',
+                customer: 'customer@sooqnaa.com'
+            };
+            
+            document.getElementById('loginEmail').value = emails[type];
+            document.getElementById('loginPassword').value = 'password123';
+        }
+
+        // Add click listeners for quick fill
+        document.addEventListener('DOMContentLoaded', function() {
+            // You can add more interactive features here
+            console.log('Sooqnaa API Tester loaded successfully! 🚀');
+        });
+    </script>
+</body>
+</html>

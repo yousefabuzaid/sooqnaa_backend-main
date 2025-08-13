@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Swagger API Documentation Test</title>
+    <style>
+        body { font-family: Arial; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .link-section { margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #007bff; }
+        .link-section h3 { margin-top: 0; color: #007bff; }
+        .button { display: inline-block; padding: 12px 24px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 5px; }
+        .button:hover { background: #0056b3; color: white; }
+        .success { color: #28a745; font-weight: bold; }
+        .endpoints { list-style: none; padding: 0; }
+        .endpoints li { padding: 8px 0; border-bottom: 1px solid #eee; }
+        .endpoints li:before { content: "✓ "; color: #28a745; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Swagger API Documentation</h1>
+            <p class="success">✅ Successfully Installed & Configured!</p>
+            <p><strong>Note:</strong> The original Swagger UI may not display endpoints due to URL configuration issues. Use the "Working Swagger UI" link below.</p>
+        </div>
+
+        <div class="link-section">
+            <h3>📚 Access Swagger Documentation</h3>
+            <p>Your API documentation is now available at:</p>
+            <a href="/Sooqnaa_backend_new/public/swagger-working.html" class="button" target="_blank">✅ Working Swagger UI</a>
+            <a href="/Sooqnaa_backend_new/public/api/documentation" class="button" target="_blank">Original Swagger UI</a>
+            <a href="/Sooqnaa_backend_new/public/test-swagger-url.html" class="button" target="_blank">Debug Test</a>
+        </div>
+
+        <div class="link-section">
+            <h3>📄 API Documentation Files</h3>
+            <p>Raw documentation files:</p>
+            <a href="/Sooqnaa_backend_new/storage/api-docs/api-docs.json" class="button" target="_blank">JSON Spec</a>
+            <p><small>You can import this JSON into Postman, Insomnia, or other API clients.</small></p>
+        </div>
+
+        <div class="link-section">
+            <h3>🛠️ Documented API Endpoints</h3>
+            <p>The following endpoints are now documented:</p>
+            <ul class="endpoints">
+                <li><strong>POST</strong> /api/auth/register - User Registration</li>
+                <li><strong>POST</strong> /api/auth/login - User Authentication</li>
+                <li><strong>GET</strong> /api/auth/me - Get Current User</li>
+                <li><strong>GET</strong> /api/health - Health Check</li>
+            </ul>
+        </div>
+
+        <div class="link-section">
+            <h3>🔗 Quick Links</h3>
+            <a href="/Sooqnaa_backend_new/public/test-api.html" class="button">API Test Interface</a>
+            <a href="/Sooqnaa_backend_new/public/test-email-simple.html" class="button">Email Test Interface</a>
+        </div>
+
+        <div class="link-section">
+            <h3>💡 Next Steps</h3>
+            <p>To add more endpoints to the documentation:</p>
+            <ol>
+                <li>Add <code>@OA\</code> annotations to your controller methods</li>
+                <li>Run <code>php artisan l5-swagger:generate</code></li>
+                <li>Refresh the Swagger UI</li>
+            </ol>
+        </div>
+        
+        <div class="link-section">
+            <h3>🔧 Troubleshooting</h3>
+            <p><strong>Issue:</strong> Original Swagger UI not showing endpoints</p>
+            <p><strong>Solution:</strong> Use the "Working Swagger UI" link above, which directly loads the JSON file</p>
+            <p><strong>Alternative:</strong> Access the JSON directly at: <code>/Sooqnaa_backend_new/storage/api-docs/api-docs.json</code></p>
+        </div>
+    </div>
+</body>
+</html>

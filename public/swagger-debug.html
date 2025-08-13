@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Swagger Debug</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        #result { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; white-space: pre-wrap; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Swagger Debug Page</h1>
+    
+    <div class="test-section">
+        <h3>Test 1: Check if JSON file exists</h3>
+        <button onclick="testJsonFile()">Test JSON File</button>
+        <div id="jsonResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 2: Check Swagger UI URL</h3>
+        <button onclick="testSwaggerUI()">Test Swagger UI</button>
+        <div id="uiResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 3: Direct JSON Content</h3>
+        <button onclick="loadJsonContent()">Load JSON Content</button>
+        <div id="jsonContent"></div>
+    </div>
+
+    <script>
+        async function testJsonFile() {
+            const result = document.getElementById('jsonResult');
+            try {
+                const response = await fetch('/Sooqnaa_backend_new/storage/api-docs/api-docs.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    result.innerHTML = `<span class="success">✅ JSON file loaded successfully!</span><br>Found ${Object.keys(data.paths || {}).length} endpoints`;
+                } else {
+                    result.innerHTML = `<span class="error">❌ Failed to load JSON file. Status: ${response.status}</span>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function testSwaggerUI() {
+            const result = document.getElementById('uiResult');
+            try {
+                const response = await fetch('/Sooqnaa_backend_new/public/api/documentation');
+                if (response.ok) {
+                    result.innerHTML = `<span class="success">✅ Swagger UI page loads successfully!</span>`;
+                } else {
+                    result.innerHTML = `<span class="error">❌ Swagger UI failed to load. Status: ${response.status}</span>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function loadJsonContent() {
+            const result = document.getElementById('jsonContent');
+            try {
+                const response = await fetch('/Sooqnaa_backend_new/storage/api-docs/api-docs.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    result.innerHTML = `<strong>API Endpoints Found:</strong><br>${Object.keys(data.paths || {}).map(path => `- ${path}`).join('<br>')}`;
+                } else {
+                    result.innerHTML = `<span class="error">❌ Failed to load JSON content</span>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

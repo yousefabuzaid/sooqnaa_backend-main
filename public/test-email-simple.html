@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Email Test</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #result { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; white-space: pre-wrap; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Email Testing Interface</h1>
+    
+    <div class="section">
+        <h3>Test 1: Register New User (Sends Welcome Email)</h3>
+        <p>This will create a new user and send a welcome email with verification link.</p>
+        <button onclick="testRegister()">Register New User</button>
+    </div>
+    
+    <div class="section">
+        <h3>Test 2: Send OTP Email</h3>
+        <p>This will send an OTP email to an existing user.</p>
+        <input type="email" id="otpEmail" placeholder="Enter email address" value="admin@sooqnaa.com" style="padding: 8px; margin: 5px;">
+        <button onclick="testOTP()">Send OTP</button>
+    </div>
+    
+    <div class="section">
+        <h3>Test 3: Request Password Reset</h3>
+        <p>This will send a password reset email.</p>
+        <input type="email" id="resetEmail" placeholder="Enter email address" value="admin@sooqnaa.com" style="padding: 8px; margin: 5px;">
+        <button onclick="testPasswordReset()">Send Reset Email</button>
+    </div>
+    
+    <div id="result">Ready to test email functionality...</div>
+
+    <script>
+        const API_BASE = `${window.location.origin}/Sooqnaa_backend_new/public/api`;
+        
+        function log(message) {
+            const result = document.getElementById('result');
+            const timestamp = new Date().toLocaleTimeString();
+            result.textContent = `[${timestamp}] ${message}\n\n${result.textContent}`;
+        }
+        
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            const url = `${API_BASE}${endpoint}`;
+            const config = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            };
+            
+            if (data) {
+                config.body = JSON.stringify(data);
+            }
+            
+            try {
+                const response = await fetch(url, config);
+                const responseData = await response.json();
+                return { status: response.status, data: responseData };
+            } catch (error) {
+                return { status: 0, data: { error: error.message } };
+            }
+        }
+        
+        async function testRegister() {
+            log('Testing user registration with email...');
+            
+            const data = {
+                first_name: 'Test',
+                last_name: 'Email',
+                email: `test${Date.now()}@example.com`,
+                phone: `+123456789${Math.floor(Math.random() * 100)}`,
+                password: 'password123',
+                password_confirmation: 'password123',
+                role: 'customer'
+            };
+            
+            const result = await apiCall('/auth/register', 'POST', data);
+            
+            if (result.status === 201) {
+                log(`✅ Registration successful! Welcome email should be sent to: ${data.email}`);
+                log(`User ID: ${result.data.user.id}`);
+                log(`Response: ${JSON.stringify(result.data, null, 2)}`);
+            } else {
+                log(`❌ Registration failed (${result.status})`);
+                log(`Error: ${JSON.stringify(result.data, null, 2)}`);
+            }
+        }
+        
+        async function testOTP() {
+            const email = document.getElementById('otpEmail').value;
+            if (!email) {
+                log('❌ Please enter an email address');
+                return;
+            }
+            
+            log(`Testing OTP email to: ${email}`);
+            
+            const result = await apiCall('/auth/send-otp', 'POST', { email });
+            
+            if (result.status === 200) {
+                log(`✅ OTP sent successfully to: ${email}`);
+                log(`Response: ${JSON.stringify(result.data, null, 2)}`);
+            } else {
+                log(`❌ OTP failed (${result.status})`);
+                log(`Error: ${JSON.stringify(result.data, null, 2)}`);
+            }
+        }
+        
+        async function testPasswordReset() {
+            const email = document.getElementById('resetEmail').value;
+            if (!email) {
+                log('❌ Please enter an email address');
+                return;
+            }
+            
+            log(`Testing password reset email to: ${email}`);
+            
+            const result = await apiCall('/auth/forgot-password', 'POST', { email });
+            
+            if (result.status === 200) {
+                log(`✅ Password reset email sent to: ${email}`);
+                log(`Response: ${JSON.stringify(result.data, null, 2)}`);
+            } else {
+                log(`❌ Password reset failed (${result.status})`);
+                log(`Error: ${JSON.stringify(result.data, null, 2)}`);
+            }
+        }
+    </script>
+</body>
+</html>
