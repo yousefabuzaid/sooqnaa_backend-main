@@ -2,11 +2,9 @@
 set -eu
 
 echo "== Cleaning up nginx configuration =="
-# Remove any existing conf.d files that might cause conflicts
 rm -f /etc/nginx/conf.d/*.conf 2>/dev/null || true
 
 echo "== Writing clean nginx configuration =="
-# Write to the correct nginx configuration location
 cat > /etc/nginx/conf.d/default.conf << 'EOF'
 server {
     listen 80;

@@ -73,7 +73,7 @@ echo "== Cleaning up nginx configuration =="
 rm -f /etc/nginx/conf.d/*.conf 2>/dev/null || true
 
 echo "== Writing clean nginx configuration =="
-cat > /nginx.conf << 'EOF'
+cat > /etc/nginx/conf.d/default.conf << 'EOF'
 server {
     listen 80;
     server_name _;
@@ -102,7 +102,7 @@ EOF
 echo "== Testing nginx configuration =="
 nginx -t && nginx -s reload || { 
     echo "Nginx test failed, showing configuration:"
-    cat /nginx.conf
+    cat /etc/nginx/conf.d/default.conf
     exit 0
 }
 
