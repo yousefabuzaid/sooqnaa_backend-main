@@ -1,7 +1,7 @@
-# Coolify Deployment Guide
+# Coolify Deployment Guide - Docker Compose
 
 ## Overview
-This guide will help you deploy your Laravel application to Coolify with the cleaned up configuration that removes all unused environment variables.
+This guide will help you deploy your Laravel application to Coolify using Docker Compose with full control over the nginx configuration.
 
 ## Changes Made
 
@@ -15,49 +15,17 @@ This guide will help you deploy your Laravel application to Coolify with the cle
 - **config/mail.php**: Removed Postmark and Resend mailers
 - **config/database.php**: Removed Redis configuration
 
-### 2. Environment Variables
-Use the cleaned environment variables from `env-clean.txt`. This includes only the variables you actually need:
-
-#### Core Application
-```
-APP_NAME=SooqnaaBackend
-APP_ENV=production
-APP_KEY=base64:YIBt2e4lIGh/H072lawSH7sgLo3e7CRGe0j7navgQ/4=
-APP_DEBUG=false
-APP_URL=https://your-domain.com
-```
-
-#### Database (MySQL)
-```
-DB_CONNECTION=mysql
-DB_HOST=your-mysql-host
-DB_PORT=3306
-DB_DATABASE=sooqnaa_db
-DB_USERNAME=your-username
-DB_PASSWORD=your-password
-```
-
-#### Cache & Sessions
-```
-CACHE_STORE=file
-SESSION_DRIVER=file
-QUEUE_CONNECTION=sync
-```
-
-#### Mail (SMTP)
-```
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=your-email@gmail.com
-MAIL_PASSWORD=your-app-password
-MAIL_ENCRYPTION=tls
-```
+### 2. Docker Setup Created
+- **Dockerfile**: Complete Laravel setup with PHP 8.2, nginx, and Node.js
+- **docker-compose.yml**: Multi-service setup with Laravel app and MySQL
+- **docker/nginx.conf**: Proper nginx configuration for Laravel
+- **docker/supervisord.conf**: Process management for nginx and PHP-FPM
+- **.dockerignore**: Optimized build context
 
 ## Coolify Configuration
 
 ### Build Pack
-Use **Nixpacks**
+Use **Docker Compose**
 
 ### Pre-deployment Command
 ```bash
@@ -66,24 +34,11 @@ php artisan migrate --force
 
 ### Post-deployment Command
 ```bash
-rm -f /app/nginx.conf
-rm -f /etc/nginx/conf.d/*.conf
-echo 'server { listen 80; server_name _; root /app/public; index index.php index.html; location / { try_files $uri $uri/ /index.php?$query_string; } location ~ \.php$ { include fastcgi_params; fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name; fastcgi_pass 127.0.0.1:9000; fastcgi_index index.php; } location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg|webp)$ { try_files $uri =404; expires max; access_log off; } }' > /etc/nginx/conf.d/default.conf
-nginx -t
-nginx -s reload
 php artisan config:clear
 php artisan route:clear
 php artisan view:clear
-```
-
-**Alternative (if the above still fails):**
-```bash
-rm -f /app/nginx.conf
-rm -f /etc/nginx/conf.d/*.conf
-echo 'server { listen 80; server_name _; root /app/public; index index.php index.html; location / { try_files $uri $uri/ /index.php?$query_string; } location ~ \.php$ { include fastcgi_params; fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name; fastcgi_pass 127.0.0.1:9000; fastcgi_index index.php; } }' > /etc/nginx/conf.d/default.conf
-nginx -t
-nginx -s reload
-php artisan config:clear
+php artisan cache:clear
+chmod -R 775 storage bootstrap/cache
 ```
 
 ## Environment Variables to Set in Coolify
@@ -95,27 +50,35 @@ Copy all variables from `env-clean.txt` to your Coolify environment variables se
 3. Update `MAIL_USERNAME` and `MAIL_PASSWORD` to match your email credentials
 4. Update `L5_SWAGGER_CONST_HOST` to match your domain
 
+## Docker Compose Benefits
+
+✅ **Full Control**: Complete control over nginx configuration  
+✅ **No Conflicts**: No more nginx configuration conflicts  
+✅ **Predictable**: Same environment every time  
+✅ **Debugging**: Easy to debug and troubleshoot  
+✅ **Customization**: Can customize any part of the setup  
+
 ## Troubleshooting
 
-### If you still see environment variable warnings:
+### If you see environment variable warnings:
 1. Make sure you've committed all the configuration changes
 2. Clear the application cache after deployment
 3. Check that all environment variables are properly set in Coolify
 
-### If nginx still fails:
-1. The post-deployment script should handle this automatically
-2. Check the deployment logs for any nginx errors
-3. The script will show the nginx configuration if it fails
+### If the application doesn't start:
+1. Check the Docker logs in Coolify
+2. Verify the Dockerfile and docker-compose.yml are correct
+3. Ensure all environment variables are set
 
 ### Database connection issues:
 1. Verify your MySQL database is accessible from the Coolify server
 2. Check that the database credentials are correct
 3. Ensure the database exists and migrations can run
 
-## Benefits of This Cleanup
+## Benefits of This Setup
 
-1. **Reduced warnings**: No more environment variable warnings for unused services
-2. **Faster startup**: Less configuration to load
-3. **Cleaner logs**: Fewer irrelevant warnings in your application logs
-4. **Better security**: No unused service configurations that could be exploited
-5. **Easier maintenance**: Only the services you actually use are configured
+1. **No nginx conflicts**: Docker Compose handles nginx configuration properly
+2. **Full control**: You control every aspect of the deployment
+3. **Predictable**: Same setup every time
+4. **Easy debugging**: Clear logs and error messages
+5. **Scalable**: Easy to add more services if needed

@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sooqnaa-backend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./storage:/app/storage
+      - ./bootstrap/cache:/app/bootstrap/cache
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+    depends_on:
+      - mysql
+    networks:
+      - sooqnaa-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: sooqnaa-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: sooqnaa_db
+      MYSQL_USER: mysql
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - sooqnaa-network
+
+networks:
+  sooqnaa-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
