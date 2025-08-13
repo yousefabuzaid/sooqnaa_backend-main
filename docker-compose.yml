@@ -5,8 +5,16 @@ services:
     build: .
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost/up || exit 1"]
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 60s
+
+# Alternative health check (uncomment if the above doesn't work):
+# healthcheck:
+#   test: ["CMD", "php", "-r", "echo 'OK';"]
+#   interval: 30s
+#   timeout: 10s
+#   retries: 3
+#   start_period: 30s
