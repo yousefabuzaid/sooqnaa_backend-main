@@ -60,6 +60,12 @@ Copy all variables from `env-clean.txt` to your Coolify environment variables se
 
 ## Troubleshooting
 
+### Port Allocation Issues:
+If you see "port is already allocated" errors:
+1. **Let Coolify handle port allocation** - Don't specify ports in docker-compose.yml
+2. **Use the simplified docker-compose.yml** provided above
+3. **Coolify will automatically assign ports** and handle routing
+
 ### If you see environment variable warnings:
 1. Make sure you've committed all the configuration changes
 2. Clear the application cache after deployment

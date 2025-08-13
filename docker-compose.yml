@@ -2,22 +2,5 @@ version: '3.8'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: sooqnaa-backend
+    build: .
     restart: unless-stopped
-    ports:
-      - "80:80"
-    volumes:
-      - ./storage:/app/storage
-      - ./bootstrap/cache:/app/bootstrap/cache
-    environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
-    networks:
-      - sooqnaa-network
-
-networks:
-  sooqnaa-network:
-    driver: bridge
