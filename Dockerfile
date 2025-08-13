@@ -57,5 +57,9 @@ RUN mkdir -p /var/log/supervisor
 # Expose port 80
 EXPOSE 80
 
+# Add health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost/up || exit 1
+
 # Start supervisor
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

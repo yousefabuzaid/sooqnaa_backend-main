@@ -21,6 +21,7 @@ This guide will help you deploy your Laravel application to Coolify using Docker
 - **docker/nginx.conf**: Proper nginx configuration for Laravel
 - **docker/supervisord.conf**: Process management for nginx and PHP-FPM
 - **.dockerignore**: Optimized build context
+- **Health Check**: Configured to use Laravel's `/up` endpoint
 
 ## Coolify Configuration
 
@@ -33,12 +34,20 @@ php artisan migrate --force
 ```
 
 ### Post-deployment Command
+
+**Option 1 (Single line with &&):**
+```bash
+php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan cache:clear && chmod -R 775 storage bootstrap/cache
+```
+
+**Option 2 (Simple version - if Option 1 fails):**
 ```bash
 php artisan config:clear
-php artisan route:clear
-php artisan view:clear
+```
+
+**Option 3 (Minimal version - if others fail):**
+```bash
 php artisan cache:clear
-chmod -R 775 storage bootstrap/cache
 ```
 
 ## Environment Variables to Set in Coolify
