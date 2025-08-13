@@ -17,7 +17,7 @@ This guide will help you deploy your Laravel application to Coolify using Docker
 
 ### 2. Docker Setup Created
 - **Dockerfile**: Complete Laravel setup with PHP 8.2, nginx, and Node.js
-- **docker-compose.yml**: Multi-service setup with Laravel app and MySQL
+- **docker-compose.yml**: Single-service setup for Laravel app (using existing Coolify database)
 - **docker/nginx.conf**: Proper nginx configuration for Laravel
 - **docker/supervisord.conf**: Process management for nginx and PHP-FPM
 - **.dockerignore**: Optimized build context
