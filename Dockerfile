@@ -51,9 +51,10 @@ COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 # Copy supervisor configuration
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Copy health check script
+# Copy health check scripts
 COPY docker/healthcheck.sh /usr/local/bin/healthcheck.sh
-RUN chmod +x /usr/local/bin/healthcheck.sh
+COPY docker/healthcheck-simple.sh /usr/local/bin/healthcheck-simple.sh
+RUN chmod +x /usr/local/bin/healthcheck.sh /usr/local/bin/healthcheck-simple.sh
 
 # Create necessary directories
 RUN mkdir -p /var/log/supervisor

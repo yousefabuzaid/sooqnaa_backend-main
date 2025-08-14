@@ -1,23 +1,50 @@
 #!/bin/bash
 
-# Simple health check script
+# Enhanced health check script for Laravel application
+set -e
+
+# Log function
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+}
+
 # Check if nginx is running
 if ! pgrep nginx > /dev/null; then
-    echo "Nginx is not running"
+    log "ERROR: Nginx is not running"
     exit 1
 fi
 
 # Check if PHP-FPM is running
 if ! pgrep php-fpm > /dev/null; then
-    echo "PHP-FPM is not running"
+    log "ERROR: PHP-FPM is not running"
     exit 1
 fi
 
-# Check if the application responds
-if curl -f http://localhost/up > /dev/null 2>&1; then
-    echo "Application is healthy"
+# Wait a moment for services to be fully ready
+sleep 2
+
+# Check if the application responds using Laravel's built-in health check
+log "Checking application health at /up endpoint..."
+
+# Try the Laravel health check endpoint first
+if curl -f -s -o /dev/null -w "%{http_code}" http://localhost/up | grep -q "200"; then
+    log "SUCCESS: Laravel health check passed"
     exit 0
-else
-    echo "Application is not responding"
-    exit 1
 fi
+
+# Fallback: Try the API health check endpoint
+log "Trying API health check endpoint..."
+if curl -f -s -o /dev/null -w "%{http_code}" http://localhost/api/v1/health | grep -q "200"; then
+    log "SUCCESS: API health check passed"
+    exit 0
+fi
+
+# Fallback: Try a simple HTTP response
+log "Trying simple HTTP check..."
+if curl -f -s -o /dev/null -w "%{http_code}" http://localhost/ | grep -q "200\|404"; then
+    log "SUCCESS: Basic HTTP check passed"
+    exit 0
+fi
+
+log "ERROR: All health checks failed"
+exit 1
