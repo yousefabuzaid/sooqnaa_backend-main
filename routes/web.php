@@ -6,6 +6,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Health check endpoint for Coolify
+Route::get('/up', function () {
+    return response('OK', 200);
+});
+
 // Swagger Documentation Route
 Route::get('/api/documentation', function () {
     $filePath = storage_path('api-docs/api-docs.json');

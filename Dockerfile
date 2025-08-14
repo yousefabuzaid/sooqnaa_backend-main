@@ -63,8 +63,8 @@ RUN chmod +x /usr/local/bin/healthcheck.sh /usr/local/bin/healthcheck-simple.sh 
 # Create necessary directories
 RUN mkdir -p /var/log/supervisor
 
-# Expose port 80
-EXPOSE 80
+# Expose port 8080
+EXPOSE 8080
 
 # Add health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
