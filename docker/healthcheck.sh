@@ -32,6 +32,16 @@ if curl -f -s -o /dev/null -w "%{http_code}" http://localhost/up | grep -q "200"
     exit 0
 fi
 
+# If Laravel health check fails, try to clear caches and retry
+log "Laravel health check failed, clearing caches..."
+/usr/local/bin/clear-cache.sh > /dev/null 2>&1
+
+# Retry Laravel health check after clearing caches
+if curl -f -s -o /dev/null -w "%{http_code}" http://localhost/up | grep -q "200"; then
+    log "SUCCESS: Laravel health check passed after cache clear"
+    exit 0
+fi
+
 # Fallback: Try the API health check endpoint
 log "Trying API health check endpoint..."
 if curl -f -s -o /dev/null -w "%{http_code}" http://localhost/api/v1/health | grep -q "200"; then

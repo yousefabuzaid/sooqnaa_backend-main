@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\HealthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -88,7 +89,7 @@ Route::middleware('auth:sanctum')->prefix('profile')->group(function () {
 });
 
 // Legacy health check (direct controller call)
-Route::get('/health', [App\Http\Controllers\Api\HealthController::class, 'check'])
+Route::get('/health', [HealthController::class, 'check'])
     ->name('health.legacy');
 
 // API Version 1 Routes
@@ -174,7 +175,7 @@ Route::prefix('v1')->group(function () {
     });
 
     // Health check route
-    Route::get('/health', [App\Http\Controllers\Api\HealthController::class, 'check'])->name('health');
+    Route::get('/health', [HealthController::class, 'check'])->name('health');
 });
 
 // Fallback route for undefined API endpoints
