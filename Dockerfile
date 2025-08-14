@@ -44,6 +44,12 @@ RUN npm run build
 
 # Set permissions
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
+RUN chmod -R 775 /app/storage /app/bootstrap/cache
+
+# Create necessary directories with proper permissions
+RUN mkdir -p /app/storage/logs /app/storage/framework/cache /app/storage/framework/sessions /app/storage/framework/views
+RUN chown -R www-data:www-data /app/storage
+RUN chmod -R 775 /app/storage
 
 # Copy nginx configuration
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf

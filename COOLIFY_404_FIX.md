@@ -3,14 +3,33 @@
 ## Problem
 Your Laravel application is returning 404 errors in Coolify because of port configuration issues.
 
-## Root Cause
-- Nginx is running on port 8080 (as shown in your `cat /proc/net/tcp` output)
-- But nginx configuration was set to listen on port 80
-- Coolify expects the application on port 8080
+## Root Cause Analysis from Deployment Logs
+
+### Issues Found:
+1. **Missing Port Mapping**: `docker-compose.yml` was missing the `ports` configuration
+2. **Permission Errors**: Cache clear failed due to insufficient permissions
+3. **Container Configuration**: Port mismatch between nginx (8080) and docker-compose (no mapping)
 
 ## Solution Applied
 
-### 1. Fixed Nginx Configuration
+### 1. Fixed Docker Compose Configuration
+Updated `docker-compose.yml` to include port mapping:
+```yaml
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"  # Added this line
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+```
+
+### 2. Fixed Nginx Configuration
 Updated `docker/nginx.conf` to listen on port 8080:
 ```nginx
 server {
@@ -19,13 +38,20 @@ server {
 }
 ```
 
-### 2. Updated Dockerfile
-Changed exposed port from 80 to 8080:
+### 3. Fixed Dockerfile Permissions
+Updated `Dockerfile` to fix permission issues:
 ```dockerfile
-EXPOSE 8080  # Changed from 80 to 8080
+# Set permissions
+RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
+RUN chmod -R 775 /app/storage /app/bootstrap/cache
+
+# Create necessary directories with proper permissions
+RUN mkdir -p /app/storage/logs /app/storage/framework/cache /app/storage/framework/sessions /app/storage/framework/views
+RUN chown -R www-data:www-data /app/storage
+RUN chmod -R 775 /app/storage
 ```
 
-### 3. Added Health Check Endpoint
+### 4. Added Health Check Endpoint
 Added `/up` endpoint in `routes/web.php` for Coolify health checks:
 ```php
 Route::get('/up', function () {
@@ -76,10 +102,11 @@ curl http://localhost:8080/
 
 ## Deployment Steps
 
-1. **Rebuild the Docker image** in Coolify
-2. **Redeploy the application**
-3. **Check the logs** for any errors
-4. **Test the endpoints** using the commands above
+1. **Commit and push** the updated files to your repository
+2. **Rebuild the Docker image** in Coolify
+3. **Redeploy the application**
+4. **Check the logs** for any errors
+5. **Test the endpoints** using the commands above
 
 ## Troubleshooting
 
@@ -94,6 +121,10 @@ curl http://localhost:8080/
 2. Check nginx error logs: `docker logs <container-name> 2>&1 | grep nginx`
 3. Check PHP-FPM logs: `docker logs <container-name> 2>&1 | grep php-fpm`
 
+### If cache clear fails:
+1. Check storage permissions: `ls -la /app/storage`
+2. Ensure www-data owns the directories: `chown -R www-data:www-data /app/storage`
+
 ## Available Endpoints
 
 After fix, these endpoints should work:
@@ -104,7 +135,16 @@ After fix, these endpoints should work:
 - `GET /` - Main application
 
 ## Files Modified
+- `docker-compose.yml` - Added port mapping 8080:8080
 - `docker/nginx.conf` - Changed port from 80 to 8080
-- `Dockerfile` - Changed EXPOSE from 80 to 8080
+- `Dockerfile` - Fixed permissions and changed EXPOSE to 8080
 - `routes/web.php` - Added `/up` health check endpoint
 - `coolify-deploy.sh` - Created deployment script
+- `test-deployment.sh` - Created testing script
+
+## Key Fix Summary
+The main issue was that `docker-compose.yml` was missing the port mapping. Without this, Coolify couldn't route traffic to your application, causing 404 errors. The fix ensures:
+1. Port 8080 is properly exposed
+2. Permissions are correctly set
+3. Health checks work properly
+4. All endpoints are accessible
