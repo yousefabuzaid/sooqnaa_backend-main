@@ -55,7 +55,9 @@ COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/healthcheck.sh /usr/local/bin/healthcheck.sh
 COPY docker/healthcheck-simple.sh /usr/local/bin/healthcheck-simple.sh
 COPY docker/clear-cache.sh /usr/local/bin/clear-cache.sh
-RUN chmod +x /usr/local/bin/healthcheck.sh /usr/local/bin/healthcheck-simple.sh /usr/local/bin/clear-cache.sh
+COPY docker/debug-routes.sh /usr/local/bin/debug-routes.sh
+COPY docker/test-simple-route.sh /usr/local/bin/test-simple-route.sh
+RUN chmod +x /usr/local/bin/healthcheck.sh /usr/local/bin/healthcheck-simple.sh /usr/local/bin/clear-cache.sh /usr/local/bin/debug-routes.sh /usr/local/bin/test-simple-route.sh
 
 # Create necessary directories
 RUN mkdir -p /var/log/supervisor
